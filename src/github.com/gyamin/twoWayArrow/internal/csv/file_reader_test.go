@@ -3,12 +3,20 @@ package csv
 import (
 	"encoding/csv"
 	"os"
+	"os/exec"
+	"strconv"
+	"strings"
 	"testing"
 )
 
 func TestConvertFileToArray(t *testing.T) {
+	csvFile := "./../../test/csv/data_j.csv"
 
-	file, err := os.Open("./../../test/csv/data_j.csv")
+	cmdLine := "cat " + csvFile + " | wc -l"
+	out, err := exec.Command("sh", "-c", cmdLine).Output()
+	fileRowNum, _ := strconv.Atoi(strings.TrimSpace(string(out)))
+
+	file, err := os.Open(csvFile)
 	if err != nil {
 		panic(err)
 	}
@@ -35,24 +43,31 @@ func TestConvertFileToArray(t *testing.T) {
 		total = total + len(data)
 	}
 
-	if total != 4017 {
+	if total != fileRowNum {
 		t.Errorf("Tha total row count is unexpected")
 	}
 }
 
 func TestConvertFileToMapArray(t *testing.T) {
+	csvFile := "./../../test/csv/data_j.csv"
 
-	file, err := os.Open("./../../test/csv/data_j.csv")
+	cmdLine := "cat " + csvFile + " | wc -l"
+	out, err := exec.Command("sh", "-c", cmdLine).Output()
+	fileRowNum, _ := strconv.Atoi(strings.TrimSpace(string(out)))
+
+	file, err := os.Open(csvFile)
 	if err != nil {
 		panic(err)
 	}
 	defer file.Close()
 
 	reader := csv.NewReader(file)
+
+	// CSV読み込み設定
 	var definitions []map[string]string
 	definitions = append(definitions, map[string]string{"key": "code", "pos": "1", "type": "string"})
 	definitions = append(definitions, map[string]string{"key": "name", "pos": "2", "type": "string"})
-	definitions = append(definitions, map[string]string{"key": "marcket", "pos": "3", "type": "string"})
+	definitions = append(definitions, map[string]string{"key": "market", "pos": "3", "type": "string"})
 
 	total := 0
 
@@ -70,6 +85,10 @@ func TestConvertFileToMapArray(t *testing.T) {
 		}
 
 		total = total + len(data)
+	}
+
+	if total != fileRowNum {
+		t.Errorf("Tha total row count is unexpected")
 	}
 
 }

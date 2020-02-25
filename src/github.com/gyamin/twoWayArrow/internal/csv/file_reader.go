@@ -47,8 +47,8 @@ func ConvertFileToMapArray(reader csv.Reader, definitions []map[string]string, r
 	var err error
 
 	var i int
-
 	for {
+		// rowNum行で読み込み止める
 		if i >= rowNum {
 			break
 		} else {

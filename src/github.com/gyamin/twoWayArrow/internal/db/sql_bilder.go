@@ -1,23 +1,23 @@
 package db
 
 import (
-	"fmt"
+	"log"
+	"strings"
 )
 
-func BuildBulkInsertSql(tableName string, data map[string]interface{}) (sql string) {
+func BuildInsertSql(tableName string, data []map[string]interface{}) (sql string) {
 
-	for key, _ := range data {
-		fmt.Print(key)
-		fmt.Print(" ")
+	sql = "INSERT INTO " + tableName + " ("
+
+	if len(data) < 1 {
+		log.Fatal("Empty data is given. Can not build insert SQL.")
 	}
-	fmt.Println()
 
-	sql = ""
-	//sql = sql + "INSERT INTO " + tableName + " ( " + strings.Join(columns, ",") + ") VALUES ("
-	//
-	//for _ , line := range data {
-	//	sql = sql + "VALUES ( " + strings.Join(line, ",")
-	//}
+	for key, _ := range data[0] {
+		sql = sql + key + ","
+	}
+	sql = strings.TrimRight(sql, ",")
+	sql = sql + " )"
 
 	return sql
 }
