@@ -4,23 +4,24 @@ import (
 	"testing"
 )
 
-type User struct {
-	name string
-	age  int
-	tel  string
-}
-
-type Users []User
-
-func TestBuildBulkInsertSql(t *testing.T) {
+func TestBuildInsertSql(t *testing.T) {
 
 	var users []map[string]interface{}
 
-	users = append(users)
+	user := make(map[string]interface{})
+	user["name"] = "太郎"
+	user["age"] = 20
+	user["tel"] = "09010002000"
+	users = append(users, user)
 
-	users = append(users, User{"太郎", 31, "012340000001"})
-	users = append(users, User{"次郎", 21, "012340000002"})
+	user = make(map[string]interface{})
+	user["name"] = "次郎"
+	user["age"] = 21
+	user["tel"] = "09010002001"
+	users = append(users, user)
 
-	sql := BuildBulkInsertSql("users", users)
+	sql := BuildInsertSql("users", users)
+
+	println(sql)
 
 }
