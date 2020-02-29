@@ -2,45 +2,39 @@ package csv
 
 import (
 	"encoding/csv"
+	"os"
 	"strconv"
 )
 
-// reader から columns で指定された要素を rowNum 行分配列で返す
-func ConvertFileToArray(reader *csv.Reader, columns []int, rowNum int) [][]string {
+type FileReader struct {
+	filePath    string
+	reader      *csv.Reader
+	definitions []map[string]interface{}
+}
 
-	var data [][]string      // 戻り値で返すオブジェクト配列
-	var readLine []string    // csvファイルの行 , 区切りで配列になる
-	var convertLine []string // columnsの設定で抽出された配列
-	var err error
-
-	var i int
-
-	for {
-		if i >= rowNum {
-			break
-		} else {
-			i++
-		}
-
-		readLine, err = reader.Read()
-		if err != nil {
-			break
-		}
-
-		for elem := range columns {
-			convertLine = append(convertLine, readLine[elem])
-		}
-
-		data = append(data, convertLine)
+func NewFileReader(filePath string) (fileReader FileReader) {
+	fileReader = FileReader{}
+	fileReader.filePath = filePath
+	file, err := os.Open(fileReader.filePath)
+	if err != nil {
+		panic(err)
 	}
+	fileReader.reader = csv.NewReader(file)
+	return fileReader
+}
 
-	return data
+func (fr *FileReader) AddDefinitions(key string, position int, kata string) {
+	def := make(map[string]interface{})
+	def["key"] = key
+	def["position"] = position
+	def["kata"] = kata
+	fr.definitions = append(fr.definitions, def)
 }
 
 // reader から definition の設定にしたがってmapを作成し rowNum 行分配列で返す
 // 	definition が [{"pos":0, "key":"id", "type":"int"}, {"pos":2, "key":"name", "type":"string"} で、
 //	csvの行データが10,Tokyo,太郎の場合、{"id":10, "name":"太郎"} を作成する
-func ConvertFileToMapArray(reader csv.Reader, definitions []map[string]string, rowNum int) []map[string]interface{} {
+func (fr FileReader) ConvertFileToMapArray(rowNum int) []map[string]interface{} {
 
 	var data []map[string]interface{} // 戻り値で返すmap配列
 	var readLine []string             // csvファイルの行 , 区切りで配列になる
@@ -55,23 +49,23 @@ func ConvertFileToMapArray(reader csv.Reader, definitions []map[string]string, r
 			i++
 		}
 
-		readLine, err = reader.Read()
+		readLine, err = fr.reader.Read()
 		if err != nil {
 			break
 		}
 
 		// definition を走査
 		mapLine := make(map[string]interface{})
-		for _, def := range definitions {
-			pos, _ := strconv.Atoi(def["pos"])
+		for _, def := range fr.definitions {
+			pos := def["position"]
 			key := def["key"]
-			kata := def["type"]
+			kata := def["kata"]
 
 			switch kata {
 			case "string":
-				mapLine[key] = readLine[pos]
+				mapLine[key.(string)] = readLine[pos.(int)]
 			case "int":
-				mapLine[key], _ = strconv.Atoi(readLine[pos])
+				mapLine[key.(string)], _ = strconv.Atoi(readLine[pos.(int)])
 			}
 		}
 		data = append(data, mapLine)
