@@ -40,3 +40,21 @@ func BuildInsertSql(tableName string, data []map[string]interface{}) (sql string
 
 	return sql
 }
+
+func BuildInsertOrUpdateSql(tableName string, data []map[string]interface{}, updateColumns []string) (sql string) {
+
+	if len(data) < 1 {
+		log.Fatal("Empty data is given. Can not build insert SQL.")
+	}
+
+	sql = BuildInsertSql(tableName, data)
+
+	sql = sql + " ON DUPLICATE KEY UPDATE "
+
+	for _, column := range updateColumns {
+		sql = sql + column + " = VALUES(" + column + "),"
+	}
+	sql = strings.TrimRight(sql, ",")
+
+	return sql
+}
