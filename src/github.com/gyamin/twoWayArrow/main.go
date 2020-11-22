@@ -10,7 +10,8 @@ import (
 func main() {
 	p, _ := os.Getwd()
 	fmt.Println(p)
-	csvFile := "src/github.com/gyamin/twoWayArrow/test/csv/data_j.csv"
+	//csvFile := "./src/github.com/gyamin/twoWayArrow/test/csv/data_j.csv"
+	csvFile := "./test/csv/data_j.csv"
 
 	fr := csv.NewFileReader(csvFile)
 	fr.AddDefinitions("code", 1, "string")
@@ -23,6 +24,6 @@ func main() {
 			break
 		}
 		insertSql := db.BuildInsertSql("stocks", csvData)
-		println(insertSql)
+		println(len(insertSql))
 	}
 }

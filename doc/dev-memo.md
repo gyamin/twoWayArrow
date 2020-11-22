@@ -4,14 +4,7 @@
 
 ### 環境情報
 
-||Version|
-|go|1.12.16|
+|言語|Version|
+|---|---|
+|go|1.15.x|
 
-### モジュール管理
-go 1.12以降は Go Modules を使う。
-
-```
-$ cd twoWayArrow/src/github.com/gyamin/twoWayArrow
-$ go mod init ./
-go: creating new go.mod: module ./
-```

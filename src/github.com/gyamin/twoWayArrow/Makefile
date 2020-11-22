@@ -1,6 +1,6 @@
 ROOT := $(shell cd ./../../../../; pwd)
 BIN_DIR := $(ROOT)/bin
-BINARY_NAME := textToTable
+BINARY_NAME := twoWayArrow
 GOPATH := $(ROOT)
 
 VERSION := $(shell git describe --tags --abbrev=0)

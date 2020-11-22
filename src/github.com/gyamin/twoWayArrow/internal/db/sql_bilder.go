@@ -52,7 +52,7 @@ func BuildInsertOrUpdateSql(tableName string, data []map[string]interface{}, upd
 	sql = sql + " ON DUPLICATE KEY UPDATE "
 
 	for _, column := range updateColumns {
-		sql = sql + column + " = VALUES(" + column + "),"
+		sql = sql + column + " = VALUES(`" + column + "`),"
 	}
 	sql = strings.TrimRight(sql, ",")
 
