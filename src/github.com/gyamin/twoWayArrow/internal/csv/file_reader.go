@@ -34,7 +34,7 @@ func (fr *FileReader) AddDefinitions(key string, position int, kata string) {
 // reader から definition の設定にしたがってmapを作成し rowNum 行分配列で返す
 // 	definition が [{"pos":0, "key":"id", "type":"int"}, {"pos":2, "key":"name", "type":"string"} で、
 //	csvの行データが10,Tokyo,太郎の場合、{"id":10, "name":"太郎"} を作成する
-func (fr FileReader) ConvertFileToMapArray(rowNum int) []map[string]interface{} {
+func (fr FileReader) ConvertFileToMapArray(rowNum int, rowHeader bool) []map[string]interface{} {
 
 	var data []map[string]interface{} // 戻り値で返すmap配列
 	var readLine []string             // csvファイルの行 , 区切りで配列になる
@@ -42,6 +42,7 @@ func (fr FileReader) ConvertFileToMapArray(rowNum int) []map[string]interface{} 
 
 	var i int
 	for {
+
 		// rowNum行で読み込み止める
 		if i >= rowNum {
 			break
@@ -52,6 +53,11 @@ func (fr FileReader) ConvertFileToMapArray(rowNum int) []map[string]interface{} 
 		readLine, err = fr.reader.Read()
 		if err != nil {
 			break
+		}
+
+		// 行ヘッダーが有る場合、1行目スキップ
+		if rowHeader && i == 1 {
+			continue
 		}
 
 		// definition を走査
@@ -68,6 +74,7 @@ func (fr FileReader) ConvertFileToMapArray(rowNum int) []map[string]interface{} 
 				mapLine[key.(string)], _ = strconv.Atoi(readLine[pos.(int)])
 			}
 		}
+
 		data = append(data, mapLine)
 	}
 
