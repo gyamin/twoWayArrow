@@ -5,6 +5,7 @@ import (
 	"github.com/gyamin/twoWayArrow/internal/csv"
 	"github.com/gyamin/twoWayArrow/internal/db"
 	testdb "github.com/gyamin/twoWayArrow/test/db"
+	"log"
 	"os"
 )
 
@@ -20,19 +21,22 @@ func main() {
 	fr.AddDefinitions("market", 3, "string")
 
 	connection := testdb.NewConnection()
+	tx, err := connection.Begin()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	csvData := fr.ConvertFileToMapArray(1)
+	dr := db.NewDataRegister("stock_codes", tx)
 
-	dr := db.NewDataRegister("stock_codes", csvData, connection)
 	affectedRows := dr.DeleteAll()
-	println(affectedRows)
 
 	for {
 		csvData := fr.ConvertFileToMapArray(1000)
 		if len(csvData) == 0 {
 			break
 		}
-		affectedRows = dr.CreateData()
+		affectedRows = dr.CreateData(csvData)
 		println(affectedRows)
 	}
+	tx.Commit()
 }

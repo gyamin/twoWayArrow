@@ -7,25 +7,20 @@ import (
 )
 
 type DataRegister struct {
-	db        *sql.DB
+	tx        *sql.Tx
 	tableName string
-	data      []map[string]interface{}
 	keys      []string
 }
 
-func NewDataRegister(tableName string, data []map[string]interface{}, db *sql.DB) (databaseRegister DataRegister) {
-	databaseRegister.db = db
+func NewDataRegister(tableName string, tx *sql.Tx) (databaseRegister DataRegister) {
+	databaseRegister.tx = tx
 	databaseRegister.tableName = tableName
-	databaseRegister.data = data
-	for key := range data[0] {
-		databaseRegister.keys = append(databaseRegister.keys, key)
-	}
 	return databaseRegister
 }
 
 func (dr *DataRegister) DeleteAll() (affectedRows int64) {
 	sql := "DELETE FROM " + dr.tableName
-	result, err := dr.db.Exec(sql)
+	result, err := dr.tx.Exec(sql)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,17 +28,17 @@ func (dr *DataRegister) DeleteAll() (affectedRows int64) {
 	return affectedRows
 }
 
-func (dr *DataRegister) CreateData() (affectedRows int64) {
+func (dr *DataRegister) CreateData(data []map[string]interface{}) (affectedRows int64) {
+	dr.keys = []string{}
+	for key := range data[0] {
+		dr.keys = append(dr.keys, key)
+	}
+
 	// insert文作成
 	insertSql := dr.buildInsertSql()
 
-	tx, err := dr.db.Begin()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, elem := range dr.data {
-		stmt, err := tx.Prepare(insertSql)
+	for _, elem := range data {
+		stmt, err := dr.tx.Prepare(insertSql)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -57,7 +52,6 @@ func (dr *DataRegister) CreateData() (affectedRows int64) {
 		}
 		affectedRows++
 	}
-	tx.Commit()
 	return affectedRows
 }
 
@@ -78,10 +72,6 @@ func (dr *DataRegister) extractValues(elem map[string]interface{}) (values []int
 
 // Insert文を生成する
 func (dr *DataRegister) buildInsertSql() (leadSql string) {
-	if len(dr.data) < 1 {
-		log.Fatal("Empty data is given. Can not build insert SQL.")
-	}
-
 	sql := "INSERT INTO " + dr.tableName + " ("
 
 	for i := 0; i < len(dr.keys); i++ {

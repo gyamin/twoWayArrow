@@ -63,12 +63,6 @@ func (fr FileReader) ConvertFileToMapArray(rowNum int) []map[string]interface{} 
 			break
 		}
 
-		// 行ヘッダーが有る場合、1行目スキップ
-		if fr.rowHeader && i == 1 {
-			fr.rowHeader = false
-			continue
-		}
-
 		// definition を走査
 		mapLine := make(map[string]interface{})
 		for _, def := range fr.definitions {
