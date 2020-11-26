@@ -23,7 +23,17 @@ func NewDataRegister(tableName string, data []map[string]interface{}, db *sql.DB
 	return databaseRegister
 }
 
-func (dr *DataRegister) CreateData() (affectedRows int) {
+func (dr *DataRegister) DeleteAll() (affectedRows int64) {
+	sql := "DELETE FROM " + dr.tableName
+	result, err := dr.db.Exec(sql)
+	if err != nil {
+		log.Fatal(err)
+	}
+	affectedRows, _ = result.RowsAffected()
+	return affectedRows
+}
+
+func (dr *DataRegister) CreateData() (affectedRows int64) {
 	// insert文作成
 	insertSql := dr.buildInsertSql()
 
