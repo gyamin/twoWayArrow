@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/gyamin/twoWayArrow/internal/csv"
-	"github.com/gyamin/twoWayArrow/internal/db"
+	"github.com/gyamin/twoWayArrow/csv"
+	"github.com/gyamin/twoWayArrow/db"
 	"log"
 	"strconv"
 )
