@@ -10,16 +10,24 @@ type FileReader struct {
 	filePath    string
 	reader      *csv.Reader
 	definitions []map[string]interface{}
+	rowHeader   bool
 }
 
-func NewFileReader(filePath string) (fileReader FileReader) {
+func NewFileReader(filePath string, rowHeader bool) (fileReader FileReader) {
 	fileReader = FileReader{}
 	fileReader.filePath = filePath
+	fileReader.rowHeader = rowHeader
 	file, err := os.Open(fileReader.filePath)
 	if err != nil {
 		panic(err)
 	}
 	fileReader.reader = csv.NewReader(file)
+
+	// ヘッダー行有りの場合１行読み込み
+	if rowHeader {
+		_, err = fileReader.reader.Read()
+	}
+
 	return fileReader
 }
 
@@ -42,6 +50,7 @@ func (fr FileReader) ConvertFileToMapArray(rowNum int) []map[string]interface{} 
 
 	var i int
 	for {
+
 		// rowNum行で読み込み止める
 		if i >= rowNum {
 			break
@@ -68,6 +77,7 @@ func (fr FileReader) ConvertFileToMapArray(rowNum int) []map[string]interface{} 
 				mapLine[key.(string)], _ = strconv.Atoi(readLine[pos.(int)])
 			}
 		}
+
 		data = append(data, mapLine)
 	}
 
