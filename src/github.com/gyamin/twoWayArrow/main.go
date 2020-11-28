@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gyamin/twoWayArrow/internal/cmd"
 	"github.com/gyamin/twoWayArrow/internal/csv"
 	"github.com/gyamin/twoWayArrow/internal/db"
 	testDb "github.com/gyamin/twoWayArrow/test/db"
@@ -29,14 +30,9 @@ func main() {
 	affectedRows := dr.DeleteAll()
 	log.Print(strconv.FormatInt(affectedRows, 10) + " Deleted")
 
-	for {
-		csvData := fr.ConvertFileToMapArray(1000)
-		if len(csvData) == 0 {
-			break
-		}
-		affectedRows = dr.CreateData(csvData)
-		log.Print(strconv.FormatInt(affectedRows, 10) + " Created")
-	}
+	affectedRows = cmd.ImportCsvToDb(fr, dr, 1000, true)
+	log.Print(strconv.FormatInt(affectedRows, 10) + " Created")
+
 	tx.Commit()
 	log.Print("End")
 }
