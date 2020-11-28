@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/gyamin/twoWayArrow/internal/cmd"
-	"github.com/gyamin/twoWayArrow/internal/csv"
-	"github.com/gyamin/twoWayArrow/internal/db"
+	"github.com/gyamin/twoWayArrow/cmd"
+	"github.com/gyamin/twoWayArrow/csv"
+	"github.com/gyamin/twoWayArrow/db"
 	testDb "github.com/gyamin/twoWayArrow/test/db"
 	"log"
 	"strconv"
